@@ -26,12 +26,10 @@
 
     <select id="findTagsByTagIds" parameterType="list" resultType="com.trench.blog.dao.pojo.Tag">
         select id,tag_name as tagName from ms_tag
-        <where>
-            id in
-            <foreach collection="tagIds" item="tagId" separator="," open="(" close=")">
-                #{tagId}
-            </foreach>
-        </where>
+        where id in
+        <foreach collection="tagIds" item="tagId" separator="," open="(" close=")">
+            #{tagId}
+        </foreach>
     </select>
 
 

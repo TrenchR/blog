@@ -30,12 +30,23 @@ public class ArticleController {
     }
 
     /**
-     * 首页最热文章
+     * 最热文章
      * @return
      */
     @PostMapping("hot")
-    public Result hotArticles() {
+    public Result hotArticle() {
         int limit = 5;
-        return articleService.hotArticles(limit);
+        return articleService.hotArticle(limit);
     }
+
+    /**
+     * 最新文章
+     * @return
+     */
+    @PostMapping("new")
+    public Result newArticles() {
+        int limit = 5;
+        return articleService.newArticles(limit);
+    }
+
 }

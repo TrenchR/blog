@@ -11,6 +11,7 @@ public interface ArticleService {
 
     /**
      * 分页查询文章流标
+     *
      * @param pageParams
      * @return
      */
@@ -18,8 +19,17 @@ public interface ArticleService {
 
     /**
      * 最热文章
+     *
      * @param limit
      * @return
      */
-    Result hotArticles(int limit);
+    Result hotArticle(int limit);
+
+    /**
+     * 最新文章
+     *
+     * @param limit
+     * @return
+     */
+    Result newArticles(int limit);
 }
