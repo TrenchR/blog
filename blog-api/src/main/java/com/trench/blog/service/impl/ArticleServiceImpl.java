@@ -1,7 +1,8 @@
-package com.trench.blog.service.Impl;
+package com.trench.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.trench.blog.dao.doc.Archives;
 import com.trench.blog.dao.mapper.ArticleMapper;
 import com.trench.blog.dao.pojo.Article;
 import com.trench.blog.service.ArticleService;
@@ -18,16 +19,26 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Trench
+ */
 @Service
 public class ArticleServiceImpl implements ArticleService {
-    @Autowired
-    private ArticleMapper articleMapper;
+
+
+    private final ArticleMapper articleMapper;
+
+    private final TagService tagService;
+
+    private final SysUserService sysUserService;
 
     @Autowired
-    private TagService tagService;
+    public ArticleServiceImpl(ArticleMapper articleMapper, TagService tagService, SysUserService sysUserService) {
+        this.articleMapper = articleMapper;
+        this.tagService = tagService;
+        this.sysUserService = sysUserService;
+    }
 
-    @Autowired
-    private SysUserService sysUserService;
 
     @Override
     public Result listArticle(PageParams pageParams) {
@@ -44,10 +55,12 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Result hotArticle(int limit) {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.orderByDesc(Article::getViewCounts);
-        // 下面语句会造成前端显示问题，参数不匹配
-        // queryWrapper.select(Article::getId,Article::getTitle);
         // sql语句：select id,title from article order by view_counts desc limit 5
+        queryWrapper.orderByDesc(Article::getViewCounts);
+        /*
+        下面语句会造成前端显示问题，参数不匹配。保留以便以后检查
+         queryWrapper.select(Article::getId,Article::getTitle);
+         */
         queryWrapper.last("limit " + limit);
         List<Article> articles = articleMapper.selectList(queryWrapper);
         return Result.success(copyList(articles,false,false));
@@ -63,6 +76,12 @@ public class ArticleServiceImpl implements ArticleService {
         queryWrapper.last("limit " + limit);
         List<Article> articles = articleMapper.selectList(queryWrapper);
         return Result.success(copyList(articles,false,false));
+    }
+
+    @Override
+    public Result listArchives() {
+        List<Archives> archivesList = articleMapper.listArchives();
+        return Result.success(archivesList);
     }
 
 
@@ -89,5 +108,4 @@ public class ArticleServiceImpl implements ArticleService {
         }
         return articleVo;
     }
-
 }

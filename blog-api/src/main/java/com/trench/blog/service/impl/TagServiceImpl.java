@@ -1,4 +1,4 @@
-package com.trench.blog.service.Impl;
+package com.trench.blog.service.impl;
 
 import com.trench.blog.dao.mapper.TagMapper;
 import com.trench.blog.dao.pojo.Tag;
