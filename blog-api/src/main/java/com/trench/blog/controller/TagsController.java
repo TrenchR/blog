@@ -15,10 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("tags")
 public class TagsController {
 
-    @Autowired
-    private TagService tagService;
+    private final TagService tagService;
 
-    // Tags/hot
+    @Autowired
+    public TagsController(TagService tagService) {
+        this.tagService = tagService;
+    }
+
+    /**
+     * 热点文章侧栏显示
+     *
+     * @return
+     */
     @GetMapping("hot")
     public Result hot() {
         int limit = 6;

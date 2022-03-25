@@ -13,7 +13,7 @@ public interface ArticleService {
      * 分页查询文章流标
      *
      * @param pageParams
-     * @return
+     * @return Result
      */
     Result listArticle(PageParams pageParams);
 
@@ -21,7 +21,7 @@ public interface ArticleService {
      * 最热文章
      *
      * @param limit
-     * @return
+     * @return Result
      */
     Result hotArticle(int limit);
 
@@ -29,13 +29,14 @@ public interface ArticleService {
      * 最新文章
      *
      * @param limit
-     * @return
+     * @return Result
      */
     Result newArticles(int limit);
 
     /**
      * 文章归档
-     * @return
+     *
+     * @return Result
      */
     Result listArchives();
 }

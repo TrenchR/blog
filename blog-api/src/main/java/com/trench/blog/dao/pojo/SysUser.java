@@ -1,5 +1,7 @@
 package com.trench.blog.dao.pojo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**
@@ -8,6 +10,12 @@ import lombok.Data;
 @Data
 public class SysUser {
 
+    /*
+     * @TableId(type = IdType.ASSIGN_ID)
+     * 以后用户多了后要进行分表操作，id需要分布式id
+     */
+
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String account;

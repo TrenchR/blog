@@ -26,17 +26,26 @@ import java.util.List;
 public class ArticleServiceImpl implements ArticleService {
 
 
-    private final ArticleMapper articleMapper;
+    private ArticleMapper articleMapper;
 
-    private final TagService tagService;
+    private SysUserService sysUserService;
 
-    private final SysUserService sysUserService;
+    private TagService tagService;
+
 
     @Autowired
-    public ArticleServiceImpl(ArticleMapper articleMapper, TagService tagService, SysUserService sysUserService) {
+    public ArticleServiceImpl(ArticleMapper articleMapper) {
         this.articleMapper = articleMapper;
-        this.tagService = tagService;
+    }
+
+    @Autowired
+    public void setSysUserService(SysUserService sysUserService) {
         this.sysUserService = sysUserService;
+    }
+
+    @Autowired
+    public void setTagService(TagService tagService) {
+        this.tagService = tagService;
     }
 
 
@@ -58,24 +67,26 @@ public class ArticleServiceImpl implements ArticleService {
         // sql语句：select id,title from article order by view_counts desc limit 5
         queryWrapper.orderByDesc(Article::getViewCounts);
         /*
-        下面语句会造成前端显示问题，参数不匹配。保留以便以后检查
-         queryWrapper.select(Article::getId,Article::getTitle);
+         * 下面语句会造成前端显示问题，参数不匹配。保留以便以后检查
+         * queryWrapper.select(Article::getId,Article::getTitle);
          */
         queryWrapper.last("limit " + limit);
         List<Article> articles = articleMapper.selectList(queryWrapper);
-        return Result.success(copyList(articles,false,false));
+        return Result.success(copyList(articles, false, false));
     }
 
     @Override
     public Result newArticles(int limit) {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.orderByDesc(Article::getCreateDate);
-        // 下面语句会造成前端显示问题，参数不匹配
-        // queryWrapper.select(Article::getId,Article::getTitle);
-        // sql语句：select id,title from article order by creat_date desc limit 5
+        /*
+         * 下面语句会造成前端显示问题，参数不匹配
+         * queryWrapper.select(Article::getId, Article::getTitle);
+         */
         queryWrapper.last("limit " + limit);
+        // 执行sql语句：select id,title from article order by creat_date desc limit 5
         List<Article> articles = articleMapper.selectList(queryWrapper);
-        return Result.success(copyList(articles,false,false));
+        return Result.success(copyList(articles, false, false));
     }
 
     @Override

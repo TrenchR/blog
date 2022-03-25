@@ -14,8 +14,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("articles")
 public class ArticleController {
 
+    private final ArticleService articleService;
+
     @Autowired
-    private ArticleService articleService;
+    public ArticleController(ArticleService articleService) {
+        this.articleService = articleService;
+    }
 
     /**
      * 首页文章列表
@@ -31,6 +35,7 @@ public class ArticleController {
 
     /**
      * 最热文章
+     *
      * @return
      */
     @PostMapping("hot")
@@ -41,6 +46,7 @@ public class ArticleController {
 
     /**
      * 最新文章
+     *
      * @return
      */
     @PostMapping("new")
@@ -51,6 +57,7 @@ public class ArticleController {
 
     /**
      * 文章归档
+     *
      * @return
      */
     @PostMapping("listArchives")

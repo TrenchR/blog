@@ -6,6 +6,9 @@ import com.trench.blog.dao.pojo.Article;
 
 import java.util.List;
 
+/**
+ * @author Trench
+ */
 public interface ArticleMapper extends BaseMapper<Article> {
     List<Archives> listArchives();
 }

@@ -25,12 +25,15 @@ public class SysUserServiceImpl implements SysUserService {
 
     private final SysUserMapper sysUserMapper;
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    public SysUserServiceImpl(SysUserMapper sysUserMapper,
-                              RedisTemplate<String, String> redisTemplate) {
+    public SysUserServiceImpl(SysUserMapper sysUserMapper) {
         this.sysUserMapper = sysUserMapper;
+    }
+
+    @Autowired
+    public void setRedisTemplate(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
@@ -38,7 +41,7 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public SysUser findUserById(Long id) {
         SysUser sysUser = sysUserMapper.selectById(id);
-        if(sysUser == null) {
+        if (sysUser == null) {
             sysUser = new SysUser();
             sysUser.setNickname("aka");
         }
@@ -51,9 +54,9 @@ public class SysUserServiceImpl implements SysUserService {
         queryWrapper.eq(SysUser::getAccount, account);
         queryWrapper.eq(SysUser::getPassword, password);
         queryWrapper.select(SysUser::getAccount,
-                            SysUser::getId,
-                            SysUser::getAvatar,
-                            SysUser::getNickname);
+                SysUser::getId,
+                SysUser::getAvatar,
+                SysUser::getNickname);
         queryWrapper.last("limit 1");
         return sysUserMapper.selectOne(queryWrapper);
     }
@@ -66,20 +69,36 @@ public class SysUserServiceImpl implements SysUserService {
          * 3 如果成功，返回对应结果 LoginUserVo
          */
         Map<String, Object> map = JWTUtils.checkToken(token);
-        if (map == null){
-            return Result.fail(ErrorCode.NO_LOGIN.getCode(),ErrorCode.NO_LOGIN.getMsg());
+        if (map == null) {
+            return Result.fail(ErrorCode.NO_LOGIN.getCode(), ErrorCode.NO_LOGIN.getMsg());
         }
+
         String userJson = redisTemplate.opsForValue().get("TOKEN_" + token);
-        if (StringUtils.isBlank(userJson)){
-            return Result.fail(ErrorCode.NO_LOGIN.getCode(),ErrorCode.NO_LOGIN.getMsg());
+        if (StringUtils.isBlank(userJson)) {
+            return Result.fail(ErrorCode.NO_LOGIN.getCode(), ErrorCode.NO_LOGIN.getMsg());
         }
+
         SysUser sysUser = JSON.parseObject(userJson, SysUser.class);
         LoginUserVo loginUserVo = new LoginUserVo();
         loginUserVo.setAccount(sysUser.getAccount());
         loginUserVo.setAvatar(sysUser.getAvatar());
         loginUserVo.setId(sysUser.getId());
         loginUserVo.setNickname(sysUser.getNickname());
+
         return Result.success(loginUserVo);
     }
 
+    @Override
+    public SysUser findUserByAccount(String account) {
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getAccount, account);
+        queryWrapper.last("limit 1");
+        return this.sysUserMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public void save(SysUser sysUser) {
+        // id会自动生成。默认生成的分布式id（雪花算法）
+        this.sysUserMapper.insert(sysUser);
+    }
 }

@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice   // 对@Controller注解的方法进行拦截处理，AOP实现
 public class AllExceptionHandler {
-    /*
-    * 进行异常处理，处理Exception.class的异常
-    */
+    /**
+     * 进行异常处理，处理Exception.class的异常
+     *
+     * @param exception
+     * @return
+     */
     @ResponseBody
     @ExceptionHandler(Exception.class)
     public Result doException(Exception exception) {

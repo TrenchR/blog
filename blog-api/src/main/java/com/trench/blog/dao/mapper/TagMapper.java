@@ -11,6 +11,7 @@ import java.util.List;
 public interface TagMapper extends BaseMapper<Tag> {
     /**
      * 根据文章id查询标签列表
+     *
      * @param articleId
      * @return
      */
@@ -18,6 +19,7 @@ public interface TagMapper extends BaseMapper<Tag> {
 
     /**
      * 查询最热标签前n条
+     *
      * @param limit
      * @return
      */

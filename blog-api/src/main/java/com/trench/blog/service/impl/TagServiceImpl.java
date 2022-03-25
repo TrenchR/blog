@@ -21,15 +21,20 @@ import java.util.List;
 @Service
 public class TagServiceImpl implements TagService {
 
-    @Autowired
-    private TagMapper tagMapper;
+    private final TagMapper tagMapper;
 
-    public TagVo copy(Tag tag){
+    @Autowired
+    public TagServiceImpl(TagMapper tagMapper) {
+        this.tagMapper = tagMapper;
+    }
+
+    public TagVo copy(Tag tag) {
         TagVo tagVo = new TagVo();
-        BeanUtils.copyProperties(tag,tagVo);
+        BeanUtils.copyProperties(tag, tagVo);
         return tagVo;
     }
-    public List<TagVo> copyList(List<Tag> tagList){
+
+    public List<TagVo> copyList(List<Tag> tagList) {
         List<TagVo> tagVoList = new ArrayList<>();
         for (Tag tag : tagList) {
             tagVoList.add(copy(tag));
@@ -47,14 +52,14 @@ public class TagServiceImpl implements TagService {
     @Override
     public Result hots(int limit) {
         /*
-        * 1. 标签所拥有的文章数量最多是最热标签
-        * 2. 查询根据tag_id分组计数，从大到小，取前limit个
-        * */
+         * 1. 标签所拥有的文章数量最多是最热标签
+         * 2. 查询根据tag_id分组计数，从大到小，取前limit个
+         * */
         List<Long> tagIds = tagMapper.findHotsTagIds(limit);
         if (CollectionUtils.isEmpty(tagIds)) {
             return Result.success(Collections.emptyList());
         }
-        // 需求的是tagId和tagName    tag对象
+        // 需求的是tagId和tagName  ==>  Tag对象
         List<Tag> tagList = tagMapper.findTagsByTagIds(tagIds);
         return Result.success(tagList);
     }

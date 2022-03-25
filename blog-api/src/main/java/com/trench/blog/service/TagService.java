@@ -10,7 +10,19 @@ import java.util.List;
  * @date 2022/3/22
  */
 public interface TagService {
+    /**
+     * 查找文章标签id
+     *
+     * @param articleId
+     * @return List<TagVo>
+     */
     List<TagVo> findTagsByArticleId(Long articleId);
 
+    /**
+     * 查找最热文章
+     *
+     * @param limit
+     * @return Result
+     */
     Result hots(int limit);
 }
