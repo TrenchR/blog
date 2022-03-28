@@ -2,6 +2,7 @@ package com.trench.blog.service;
 
 import com.trench.blog.dao.pojo.SysUser;
 import com.trench.blog.vo.Result;
+import com.trench.blog.vo.UserVo;
 
 /**
  * @author Trench
@@ -36,6 +37,7 @@ public interface SysUserService {
 
     /**
      * 根据账户名查找用户
+     *
      * @param account
      * @return
      */
@@ -43,7 +45,17 @@ public interface SysUserService {
 
     /**
      * 保存用户
+     *
      * @param sysUser
      */
     void save(SysUser sysUser);
+
+    /**
+     * 根据id查询用户信息vo
+     *
+     * @param authorId
+     * @return
+     */
+    UserVo findUserVoById(Long authorId);
+
 }

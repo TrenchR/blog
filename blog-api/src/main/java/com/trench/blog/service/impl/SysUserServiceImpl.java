@@ -9,7 +9,9 @@ import com.trench.blog.utils.JWTUtils;
 import com.trench.blog.vo.ErrorCode;
 import com.trench.blog.vo.LoginUserVo;
 import com.trench.blog.vo.Result;
+import com.trench.blog.vo.UserVo;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,6 @@ public class SysUserServiceImpl implements SysUserService {
         this.redisTemplate = redisTemplate;
     }
 
-
     @Override
     public SysUser findUserById(Long id) {
         SysUser sysUser = sysUserMapper.selectById(id);
@@ -51,12 +52,9 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public SysUser findUser(String account, String password) {
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SysUser::getAccount, account);
-        queryWrapper.eq(SysUser::getPassword, password);
-        queryWrapper.select(SysUser::getAccount,
-                SysUser::getId,
-                SysUser::getAvatar,
-                SysUser::getNickname);
+        queryWrapper.eq(SysUser::getAccount,account);
+        queryWrapper.eq(SysUser::getPassword,password);
+        queryWrapper.select(SysUser::getId,SysUser::getAccount,SysUser::getAvatar,SysUser::getNickname);
         queryWrapper.last("limit 1");
         return sysUserMapper.selectOne(queryWrapper);
     }
@@ -69,13 +67,13 @@ public class SysUserServiceImpl implements SysUserService {
          * 3 如果成功，返回对应结果 LoginUserVo
          */
         Map<String, Object> map = JWTUtils.checkToken(token);
-        if (map == null) {
-            return Result.fail(ErrorCode.NO_LOGIN.getCode(), ErrorCode.NO_LOGIN.getMsg());
+        if (map == null){
+            return Result.fail(ErrorCode.NO_LOGIN.getCode(),ErrorCode.NO_LOGIN.getMsg());
         }
 
         String userJson = redisTemplate.opsForValue().get("TOKEN_" + token);
-        if (StringUtils.isBlank(userJson)) {
-            return Result.fail(ErrorCode.NO_LOGIN.getCode(), ErrorCode.NO_LOGIN.getMsg());
+        if (StringUtils.isBlank(userJson)){
+            return Result.fail(ErrorCode.NO_LOGIN.getCode(),ErrorCode.NO_LOGIN.getMsg());
         }
 
         SysUser sysUser = JSON.parseObject(userJson, SysUser.class);
@@ -84,7 +82,6 @@ public class SysUserServiceImpl implements SysUserService {
         loginUserVo.setAvatar(sysUser.getAvatar());
         loginUserVo.setId(sysUser.getId());
         loginUserVo.setNickname(sysUser.getNickname());
-
         return Result.success(loginUserVo);
     }
 
@@ -101,4 +98,19 @@ public class SysUserServiceImpl implements SysUserService {
         // id会自动生成。默认生成的分布式id（雪花算法）
         this.sysUserMapper.insert(sysUser);
     }
+
+    @Override
+    public UserVo findUserVoById(Long authorId) {
+        SysUser sysUser = sysUserMapper.selectById(authorId);
+        if (sysUser == null) {
+            sysUser = new SysUser();
+            // 设置一个默认值，防止为空
+            sysUser.setAvatar("/static/img/logo.b3a48c0.png");
+            sysUser.setNickname("aka");
+        }
+        UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(sysUser, userVo);
+        return userVo;
+    }
+
 }

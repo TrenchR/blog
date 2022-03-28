@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice   // 对@Controller注解的方法进行拦截处理，AOP实现
 public class AllExceptionHandler {
+
     /**
      * 进行异常处理，处理Exception.class的异常
      *
@@ -24,4 +25,5 @@ public class AllExceptionHandler {
         exception.printStackTrace();
         return Result.fail(-999, "系统异常");
     }
+
 }

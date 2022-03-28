@@ -14,7 +14,6 @@ public class SysUser {
      * @TableId(type = IdType.ASSIGN_ID)
      * 以后用户多了后要进行分表操作，id需要分布式id
      */
-
     @TableId(type = IdType.AUTO)
     private Long id;
 
@@ -41,4 +40,5 @@ public class SysUser {
     private String salt;
 
     private String status;
+
 }

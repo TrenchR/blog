@@ -10,5 +10,6 @@ import java.util.List;
  * @author Trench
  */
 public interface ArticleMapper extends BaseMapper<Article> {
+
     List<Archives> listArchives();
 }

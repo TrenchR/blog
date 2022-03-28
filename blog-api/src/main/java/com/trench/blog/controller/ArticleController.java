@@ -1,6 +1,7 @@
 package com.trench.blog.controller;
 
 import com.trench.blog.service.ArticleService;
+import com.trench.blog.vo.ArticleVo;
 import com.trench.blog.vo.Result;
 import com.trench.blog.vo.params.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,18 @@ public class ArticleController {
     @PostMapping("listArchives")
     public Result listArchives() {
         return articleService.listArchives();
+    }
+
+
+    /**
+     * 查看文章详情
+     *
+     * @param articleId
+     * @return
+     */
+    @PostMapping("view/{id}")
+    public Result findArticleById(@PathVariable("id") Long articleId) {
+        return Result.success(articleService.findArticleById(articleId));
     }
 
 }
