@@ -5,18 +5,25 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.trench.blog.dao.doc.Archives;
 import com.trench.blog.dao.mapper.ArticleBodyMapper;
 import com.trench.blog.dao.mapper.ArticleMapper;
+import com.trench.blog.dao.mapper.ArticleTagMapper;
 import com.trench.blog.dao.mapper.CategoryMapper;
 import com.trench.blog.dao.pojo.Article;
 import com.trench.blog.dao.pojo.ArticleBody;
+import com.trench.blog.dao.pojo.ArticleTag;
+import com.trench.blog.dao.pojo.SysUser;
 import com.trench.blog.service.*;
+import com.trench.blog.utils.UserThreadLocal;
 import com.trench.blog.vo.ArticleBodyVo;
 import com.trench.blog.vo.ArticleVo;
 import com.trench.blog.vo.Result;
+import com.trench.blog.vo.TagVo;
+import com.trench.blog.vo.params.ArticleParam;
 import com.trench.blog.vo.params.PageParams;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +37,7 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleMapper articleMapper;
     private ArticleBodyMapper articleBodyMapper;
     private CategoryMapper categoryMapper;
+    private ArticleTagMapper articleTagMapper;
 
     private SysUserService sysUserService;
 
@@ -53,6 +61,11 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     public void setCategoryMapper(CategoryMapper categoryMapper) {
         this.categoryMapper = categoryMapper;
+    }
+
+    @Autowired
+    public void setArticleTagMapper(ArticleTagMapper articleTagMapper) {
+        this.articleTagMapper = articleTagMapper;
     }
 
     @Autowired
@@ -142,6 +155,56 @@ public class ArticleServiceImpl implements ArticleService {
         ArticleBodyVo articleBodyVo = new ArticleBodyVo();
         articleBodyVo.setContent(articleBody.getContent());
         return articleBodyVo;
+    }
+
+    @Override
+    @Transactional
+    public Result publish(ArticleParam articleParam) {
+        // 此接口必须加入到登录拦截当中
+        SysUser sysUser = UserThreadLocal.get();
+
+        /*
+         * 1. 发布文章，构建Article对象
+         * 2. 作者id，当前的登录用户
+         * 3. 将标签加入到关联列表中
+         * 4. 内容存储, article bodyId
+         */
+        Article article = new Article();
+        article.setAuthorId(sysUser.getId());
+        article.setCategoryId(articleParam.getCategory().getId());
+        article.setCreateDate(System.currentTimeMillis());
+        article.setCommentCounts(0);
+        article.setSummary(articleParam.getSummary());
+        article.setTitle(articleParam.getTitle());
+        article.setViewCounts(0);
+        article.setWeight(Article.Article_Common);
+        article.setBodyId(-1L);
+        this.articleMapper.insert(article);
+
+        //tags
+        List<TagVo> tags = articleParam.getTags();
+        if (tags != null) {
+            for (TagVo tag : tags) {
+                ArticleTag articleTag = new ArticleTag();
+                articleTag.setArticleId(article.getId());
+                articleTag.setTagId(tag.getId());
+                articleTagMapper.insert(articleTag);
+            }
+        }
+
+        // Body
+        ArticleBody articleBody = new ArticleBody();
+        articleBody.setContent(articleParam.getBody().getContent());
+        articleBody.setContentHtml(articleParam.getBody().getContentHtml());
+        articleBody.setArticleId(article.getId());
+        articleBodyMapper.insert(articleBody);
+
+        article.setBodyId(articleBody.getId());
+        articleMapper.updateById(article);
+        ArticleVo articleVo = new ArticleVo();
+        articleVo.setId(article.getId());
+
+        return Result.success(articleVo);
     }
 
     private List<ArticleVo> copyList(List<Article> records, boolean isTag, boolean isAuthor) {

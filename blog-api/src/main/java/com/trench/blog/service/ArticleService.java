@@ -3,6 +3,7 @@ package com.trench.blog.service;
 
 import com.trench.blog.vo.ArticleVo;
 import com.trench.blog.vo.Result;
+import com.trench.blog.vo.params.ArticleParam;
 import com.trench.blog.vo.params.PageParams;
 
 /**
@@ -47,4 +48,12 @@ public interface ArticleService {
      * @return
      */
     ArticleVo findArticleById(Long articleId);
+
+    /**
+     * 发布文章
+     *
+     * @param articleParam
+     * @return
+     */
+    Result publish(ArticleParam articleParam);
 }

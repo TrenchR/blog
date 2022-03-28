@@ -1,5 +1,6 @@
 package com.trench.blog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.trench.blog.dao.mapper.TagMapper;
 import com.trench.blog.dao.pojo.Tag;
 import com.trench.blog.service.TagService;
@@ -28,20 +29,6 @@ public class TagServiceImpl implements TagService {
         this.tagMapper = tagMapper;
     }
 
-    public TagVo copy(Tag tag) {
-        TagVo tagVo = new TagVo();
-        BeanUtils.copyProperties(tag, tagVo);
-        return tagVo;
-    }
-
-    public List<TagVo> copyList(List<Tag> tagList) {
-        List<TagVo> tagVoList = new ArrayList<>();
-        for (Tag tag : tagList) {
-            tagVoList.add(copy(tag));
-        }
-        return tagVoList;
-    }
-
     @Override
     public List<TagVo> findTagsByArticleId(Long articleId) {
         // mybatis Plus不能进行多表查询
@@ -64,4 +51,23 @@ public class TagServiceImpl implements TagService {
         return Result.success(tagList);
     }
 
+    @Override
+    public Result findAll() {
+        List<Tag> tags = this.tagMapper.selectList(new LambdaQueryWrapper<>());
+        return Result.success(copyList(tags));
+    }
+
+    public TagVo copy(Tag tag) {
+        TagVo tagVo = new TagVo();
+        BeanUtils.copyProperties(tag, tagVo);
+        return tagVo;
+    }
+
+    public List<TagVo> copyList(List<Tag> tagList) {
+        List<TagVo> tagVoList = new ArrayList<>();
+        for (Tag tag : tagList) {
+            tagVoList.add(copy(tag));
+        }
+        return tagVoList;
+    }
 }
