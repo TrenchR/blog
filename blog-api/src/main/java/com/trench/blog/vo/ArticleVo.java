@@ -15,8 +15,8 @@ public class ArticleVo {
     /**
      *一定要记得加要不然 会出现精度损失
      */
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+//    @JsonSerialize(using = ToStringSerializer.class)
+    private String id;
 
     private String title;
 

@@ -32,4 +32,18 @@ public interface TagService {
      * @return
      */
     Result findAll();
+
+    /**
+     * 查找所有tag的详情
+     *
+     * @return
+     */
+    Result findAllDetail();
+
+    /**
+     * 文章列表通过id查找详情
+     * @param id
+     * @return
+     */
+    Result findDetailById(Long id);
 }

@@ -1,6 +1,7 @@
 package com.trench.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.trench.blog.dao.doc.Archives;
 import com.trench.blog.dao.mapper.ArticleBodyMapper;
@@ -90,15 +91,42 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Result listArticle(PageParams pageParams) {
-        // 分页查询article数据库表
-        Page<Article> page = new Page<>(pageParams.getPage(), pageParams.getPageSize());
-        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.orderByDesc(Article::getCreateDate, Article::getWeight);
-        Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
-        List<Article> records = articlePage.getRecords();
-        List<ArticleVo> articleVoList = copyList(records, true, true);
-        return Result.success(articleVoList);
+        Page<Article> page = new Page<>(pageParams.getPage(),pageParams.getPageSize());
+        IPage<Article> articleIPage = this.articleMapper.listArticle(page,
+                pageParams.getCategoryId(),
+                pageParams.getTagId(),
+                pageParams.getYear(),
+                pageParams.getMonth());
+        return Result.success(copyList(articleIPage.getRecords(),true,true));
     }
+
+//    @Override
+//    public Result listArticle(PageParams pageParams) {
+//        // 分页查询article数据库表
+//        Page<Article> page = new Page<>(pageParams.getPage(), pageParams.getPageSize());
+//        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
+//        // 查询文章的参数 加上分类id，判断不为空 加上分类条件
+//        if (pageParams.getCategoryId() != null) {
+//            queryWrapper.eq(Article::getCategoryId, pageParams.getCategoryId());
+//        }
+//        List<Long> articleIdList = new ArrayList<>();
+//        if (pageParams.getTagId() != null) {
+//            LambdaQueryWrapper<ArticleTag> articleTagLambdaQueryWrapper = new LambdaQueryWrapper<>();
+//            articleTagLambdaQueryWrapper.eq(ArticleTag::getTagId, pageParams.getTagId());
+//            List<ArticleTag> articleTags = articleTagMapper.selectList(articleTagLambdaQueryWrapper);
+//            for (ArticleTag articleTag : articleTags) {
+//                articleIdList.add(articleTag.getArticleId());
+//            }
+//            if (articleIdList.size() > 0) {
+//                queryWrapper.in(Article::getId, articleIdList);
+//            }
+//        }
+//        queryWrapper.orderByDesc(Article::getCreateDate, Article::getWeight);
+//        Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
+//        List<Article> records = articlePage.getRecords();
+//        List<ArticleVo> articleVoList = copyList(records, true, true);
+//        return Result.success(articleVoList);
+//    }
 
     @Override
     public Result hotArticle(int limit) {
@@ -171,7 +199,7 @@ public class ArticleServiceImpl implements ArticleService {
          */
         Article article = new Article();
         article.setAuthorId(sysUser.getId());
-        article.setCategoryId(articleParam.getCategory().getId());
+        article.setCategoryId(Long.parseLong(articleParam.getCategory().getId()));
         article.setCreateDate(System.currentTimeMillis());
         article.setCommentCounts(0);
         article.setSummary(articleParam.getSummary());
@@ -187,7 +215,7 @@ public class ArticleServiceImpl implements ArticleService {
             for (TagVo tag : tags) {
                 ArticleTag articleTag = new ArticleTag();
                 articleTag.setArticleId(article.getId());
-                articleTag.setTagId(tag.getId());
+                articleTag.setTagId(Long.parseLong(tag.getId()));
                 articleTagMapper.insert(articleTag);
             }
         }
@@ -202,7 +230,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setBodyId(articleBody.getId());
         articleMapper.updateById(article);
         ArticleVo articleVo = new ArticleVo();
-        articleVo.setId(article.getId());
+        articleVo.setId(String.valueOf(article.getId()));
 
         return Result.success(articleVo);
     }
@@ -229,6 +257,7 @@ public class ArticleServiceImpl implements ArticleService {
                           boolean isTag, boolean isAuthor,
                           boolean isBody, boolean isCategory) {
         ArticleVo articleVo = new ArticleVo();
+        articleVo.setId(String.valueOf(article.getId()));
         BeanUtils.copyProperties(article, articleVo);
         articleVo.setCreateDate(new DateTime(article.getCreateDate()).toString("yyyy-MM-dd HH:mm"));
         // 不是所有接口都需要标签和作者信息

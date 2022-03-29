@@ -10,11 +10,10 @@ import lombok.Data;
 @Data
 public class TagVo {
 
-    // 原来是String
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+//    @JsonSerialize(using = ToStringSerializer.class)
+    private String id;
 
     private String tagName;
 
-//    private String avatar;
+    private String avatar;
 }
