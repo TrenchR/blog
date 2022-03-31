@@ -1,11 +1,9 @@
 <template>
   <el-footer class="me-area">
     <div class="me-footer">
-      <p>Designed by
-        <strong>
-          <router-link to="/" class="me-login-design-color">码神之路</router-link>
-        </strong>
-      </p>
+      <strong>
+        <router-link to="/" class="me-login-design-color">富强  民主  文明  和谐  自由  平等  公正  法治  爱国  敬业  诚信  友善</router-link>
+      </strong>
     </div>
   </el-footer>
 
@@ -28,7 +26,7 @@
 
   .el-footer {
     min-width: 100%;
-    box-shadow: 0 -2px 3px hsla(0, 0%, 7%, .1), 0 0 0 1px hsla(0, 0%, 7%, .1);
+    box-shadow: 0 -2px 2px hsla(0, 0%, 7%, .1), 0 0 0 1px hsla(0, 0%, 7%, .1);
     position: absolute;
     bottom: 0;
     left: 0;
@@ -39,7 +37,7 @@
     text-align: center;
     line-height: 60px;
     font-family: 'Open Sans', sans-serif;
-    font-size: 18px;
+    font-size: 16px;
 
   }
 
